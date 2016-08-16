@@ -17,7 +17,7 @@ How is class built?
 - `remove()`
 - `removeOne()`
 
-If you want to create new instnce of function, you need to use this commend: `$session = new Module\Session();`
+If you want to create new instance of class, you need to use this commend: `$session = new Module\Session();`
 
 Changelog
 --------
