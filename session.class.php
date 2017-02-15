@@ -1,64 +1,62 @@
 <?php
 /**
- *
- * @author Dominik Ryńko
- * @contact: http://www.rynko.pl/
- * @version 1.1
+ * @author Dominik Ryńko <http://rynko.pl/>
  * @license http://creativecommons.org/licenses/by-sa/3.0/pl/
+ * @Version 1.2
  */
 
 namespace Module;
 
-class Session
-{
+/**
+ * Class Session
+ * @package Module
+ */
+class Session {
+
     /**
      * @param none
      * @return string || bool
      */
     public function getSessionId()
     {
-        return !is_null(session_id()) ? session_id() : false;
+        return !empty(session_id()) ? session_id() : false;
     }
-
     /**
      * @param bool $type
      * @return bool
-    */
+     */
     public function regenerateId($type = true)
     {
-        if ($type === true) {
-            return session_regenerate_id(true);
-        } else {
-            return session_regenerate_id();
-        }
+        return $type ? session_regenerate_id(true) : session_regenerate_id();
     }
 
     /**
-     * @param string $key
-     * @param bool $multi
-     * @return string || array
-    */
-    public function get($key, $multi = false)
+     * @param $key
+     * @return string
+     */
+    public function get($key)
     {
-        if ($multi === false) {
-            return $_SESSION[$key];
-        } else {
-            return $_SESSION;
-        }
+        return $this -> secure($_SESSION[$key]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function all()
+    {
+        return $this -> secure($_SESSION);
     }
 
     /**
      * @param array $data
-     * @param bool $multi
      * @return string || array
-    */
-    public function set($data = [], $multi = false)
+     */
+    public function set($data = [])
     {
-        if ($multi === false) {
+        if (count($data) == 1) {
             if (version_compare(PHP_VERSION, '5.4.0') <= 0) {
                 $keys = array_keys($data);
                 $values = array_values($data);
-
                 $_SESSION[$keys[0]] = $values[0];
             } else {
                 $_SESSION[array_keys($data)[0]] = array_values($data)[0];
@@ -68,24 +66,21 @@ class Session
                 $_SESSION[$key] = $value;
             }
         }
-    }
 
+        return null;
+    }
     /**
      * @param string $name
      * @return bool
-    */
+     */
     public function exists($name)
     {
-        if (empty($name)) {
-            return null;
-        } else {
-            return array_key_exists($name, $_SESSION) ? true : false;
-        }
+        return empty($name) ? null : array_key_exists($name, $_SESSION);
     }
 
     /**
      * @param bool $type
-    */
+     */
     public function remove($type = false)
     {
         if ($type === false) {
@@ -98,19 +93,35 @@ class Session
     /**
      * @param string $key
      * @return bool
-    */
+     */
     public function removeOne($key)
     {
         if (empty($key)) {
             return null;
         } else {
-            $variable = $_SESSION[$key];
+            if ($this -> exists($key)) {
+                unset($_SESSION[$key]);
+            }
+        }
 
-            if (isset($variable)) {
-                unset($variable);
+        return null;
+    }
+
+    /**
+     * @param $data
+     * @return string
+     */
+    private function secure($data)
+    {
+        if (!is_array($data)) {
+            return htmlspecialchars(trim($data));
+        } else {
+            $array = [];
+            foreach ($data as $key => $value) {
+                $array[$key] = $this -> secure($value);
             }
 
-            return is_null($variable) ? true : false;
+            return $array;
         }
     }
 }

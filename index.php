@@ -1,30 +1,31 @@
 <?php
 session_start();
 
-$sessionFile = 'session.class.php';
+$file = 'session.class.php';
 
-if (file_exists($sessionFile) && filesize($sessionFile) !== 0) {
-    include $sessionFile;
+if (file_exists($file) && filesize($file) !== 0) {
+    include $file;
 } else {
-    exit('File: '. $sessionFile. 'does not exist or is empty');
+    exit('File: '. $file. 'does not exist or is empty');
 }
 
-$session = new Module\Session();
+$session = new \Module\Session();
 
 // Create one key which has assigned value
-$session -> set(['key' => 'value']);
+$session -> set(['key' => 'value', 'key2' => 'value2']);
 
 // Return ID of session
 $string = $session -> getSessionId();
 
-// Create more session data from array given as a argument, second param tells that method should create more than one session data
-$session -> get(['key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3'], true);
+// Create more session data from array given as a argument
+$session -> set(['key11' => 'value11', 'key22' => 'value22', 'key33' => 'value33']);
 
 // Check, if key exists in $_SESSION array
 $result = $session -> exists('key2');
 
 // Remove one key from $_SESSION array
-$session -> removeOne('key3');
+$session -> removeOne('key2');
 
 // remove all session data
 $session -> remove();
+
