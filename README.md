@@ -1,13 +1,10 @@
 # Session class
 
------------------
-
-This is class, which provides easy way to manage sessions using custom PHP functions on your website.
+Session class provides easy way to manage sessions using custom PHP functions on your website.
  
 ## How to use
 
------------------
-To start using class, you have to include this class to your project, eg. use `include`,`require` function or `__autoload()` function. 
+To start using class, you need to include this class to your project, eg. use `include`,`require` or `__autoload()` function. 
 To run tests locally, install dependencies first by `composer install`
 
 ##  Contributing
@@ -16,7 +13,6 @@ If you have any idea how application can be improved, please create new issue wi
 
 ## Changelog
 
---------
 [16-08-2013] - v1.0
 - First version has been released 
 
@@ -38,6 +34,5 @@ If you have any idea how application can be improved, please create new issue wi
 
 ## ToDo
 
---------
 - Add management of session lifetime
 - Add class loading by Composer
