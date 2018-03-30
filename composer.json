@@ -1,0 +1,13 @@
+{
+    "name": "mixset/session-management-class",
+    "authors": [
+        {
+            "name": "mixset",
+            "email": "dominikrynko@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "5.*"
+    }
+}
