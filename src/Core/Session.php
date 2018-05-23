@@ -2,10 +2,9 @@
 /**
  * @author Dominik Ryńko <http://rynko.pl/>
  * @license http://creativecommons.org/licenses/by-sa/3.0/pl/
- * @Version 1.3
 */
 
-namespace Core;
+namespace SessionManager;
 
 class Session
 {
@@ -21,12 +20,12 @@ class Session
      * Check, if session has been initialized.
      *
      * Session constructor.
-     * @throws \SessionException
+     * @throws SessionException
     */
     public function __construct()
     {
         if (session_status() === PHP_SESSION_NONE) {
-            throw new \SessionException('session_start() function is not called.');
+            throw new SessionException('session_start() function is not called.');
         }
     }
 
@@ -42,13 +41,13 @@ class Session
 
     /**
      * @param none
-     * @return string || bool
+     * @return string || null
     */
     public function getSessionId()
     {
         return empty(session_id()) === false
             ? session_id()
-            : false;
+            : null;
     }
 
     /**
