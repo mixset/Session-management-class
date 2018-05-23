@@ -5,7 +5,8 @@ Session class provides easy way to manage sessions using custom PHP functions on
 ## How to use
 
 To start using class, you need to include this class to your project, eg. use `include`,`require` or `__autoload()` function. 
-To run tests locally, install dependencies first by `composer install`
+To run tests locally, install dependencies first by `composer install`.
+It will install latest `phpunit` for php 5.6 version.
 
 ##  Contributing
 
