@@ -80,7 +80,7 @@ class Session
 
     /**
      * @return mixed
-     */
+    */
     public function all()
     {
         return $this->secure($_SESSION);
@@ -88,11 +88,14 @@ class Session
 
     /**
      * @param array $data
-     * @return string || array
+     * @param array $except
+     *
+     * @return string | array
      */
-    public function set(array $data)
+    public function set(array $data, array $except = [])
     {
-        $data = $this->secure($data);
+        $this->setExceptKeys($except);
+       # $data = $this->secure($data);
 
         if (count($data) === 1) {
             $_SESSION[array_keys($data)[0]] = array_values($data)[0];
@@ -158,12 +161,33 @@ class Session
     */
     private function secure($toFilter, $sanitize = FILTER_SANITIZE_STRING)
     {
+        var_dump($toFilter);
+        if (is_string($toFilter)) {
+            $toFilter = [$toFilter];
+            var_dump($toFilter);
+        }
+
+        $notFiltered = $this->getNonFilteredElements($toFilter);
+return $notFiltered;
+       # return $notFiltered + filter_var_array($toFilter, $sanitize);
+    }
+
+    /**
+     * @param $toFilter
+     *
+     * @return array
+    */
+    private function getNonFilteredElements($toFilter)
+    {
         $notFiltered = [];
 
         if (count($this->except) > 0) {
-            $notFiltered = array_diff_key(array_keys($toFilter), $this->except);
+            $notFiltered = array_diff_key(
+                $toFilter,
+                array_diff_key($toFilter, array_flip($this->except))
+            );
         }
 
-        return $notFiltered + filter_var_array($toFilter, $sanitize);
+        return $notFiltered;
     }
 }
