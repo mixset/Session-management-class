@@ -20,21 +20,21 @@ class SessionTest extends TestCase
 
         $this->session->set([
             'foo' => '<b>bar</b>',
-         #   'key' => 'value',
-         #   'class' => 'Session',
-         #   'id' => 1,
-        ]);
+            'key' => 'value',
+            'class' => '<xxD>Session</xxD>',
+            'id' => 1,
+        ], ['foo']);
     }
 
     public function testGetValueFromSession()
     {
         $this->assertEquals('bar', $this->session->get('foo'));
-       # $this->assertEquals('value', $this->session->get('key'));
-      #  $this->assertEquals('Session', $this->session->get('class'));
-      #  $this->assertEquals(1, $this->session->get('id'));
+        $this->assertEquals('value', $this->session->get('key'));
+        $this->assertEquals('Session', $this->session->get('class'));
+        $this->assertEquals(1, $this->session->get('id'));
     }
 
-    /*public function testGetAllSessionCount()
+    public function testGetAllSessionCount()
     {
         $this->assertEquals(4, count($this->session->all()));
     }
@@ -70,17 +70,17 @@ class SessionTest extends TestCase
     public function testExceptKeys()
     {
         $this->session->delete(2);
-
-        $this->session->set([
-            'login' => '<b>Test</b>',
-            'email' => 'username@domain.com'
-        ]);
+        $this->session->clearExceptKeys();
 
         $this->session->setExceptKeys(['login']);
+        $this->session->set([
+            'login' => '<b>Test</b>',
+            'email' => 'username@domain.com',
+        ]);
 
-        $this->assertEquals(11, count($this->session->get('login')));
-        $this->assertEquals(19, count($this->session->get('email')));
-    }*/
+        $this->assertEquals(11, strlen($this->session->get('login')));
+        $this->assertEquals(19, strlen($this->session->get('email')));
+    }
 
     public function tearDown()
     {

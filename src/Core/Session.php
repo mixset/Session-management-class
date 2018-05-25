@@ -14,7 +14,7 @@ class Session
      *
      * @var array
     */
-    protected $except = [];
+    public $rawResponse = [];
 
     /**
      * Check, if session has been initialized.
@@ -36,12 +36,19 @@ class Session
     */
     public function setExceptKeys(array $keys)
     {
-        $this->except = $keys;
+        $this->rawResponse = $keys;
     }
 
     /**
-     * @param none
-     * @return string || null
+     * Clear all except keys
+    */
+    public function clearExceptKeys()
+    {
+        $this->rawResponse = [];
+    }
+
+    /**
+     * @return null|string
     */
     public function getSessionId()
     {
@@ -75,7 +82,7 @@ class Session
     */
     public function get($key)
     {
-        return $this->secure($_SESSION[$key]);
+        return $this->secure($key, $_SESSION[$key]);
     }
 
     /**
@@ -83,19 +90,18 @@ class Session
     */
     public function all()
     {
-        return $this->secure($_SESSION);
+        return $this->secureArray($_SESSION);
     }
 
     /**
      * @param array $data
-     * @param array $except
+     * @param array $rawResponse
      *
      * @return string | array
-     */
-    public function set(array $data, array $except = [])
+    */
+    public function set(array $data)
     {
-        $this->setExceptKeys($except);
-       # $data = $this->secure($data);
+        $data = $this->secureArray($data);
 
         if (count($data) === 1) {
             $_SESSION[array_keys($data)[0]] = array_values($data)[0];
@@ -159,17 +165,25 @@ class Session
      * @param int $sanitize
      * @return mixed
     */
-    private function secure($toFilter, $sanitize = FILTER_SANITIZE_STRING)
+    private function secureArray($toFilter, $sanitize = FILTER_SANITIZE_STRING)
     {
-        var_dump($toFilter);
-        if (is_string($toFilter)) {
-            $toFilter = [$toFilter];
-            var_dump($toFilter);
+        $notFiltered = $this->getNonFilteredElements($toFilter);
+        return $notFiltered + filter_var_array($toFilter, $sanitize);
+    }
+
+    /**
+     * @param $key
+     * @param $toFilter
+     * @param int $sanitize
+     * @return mixed
+    */
+    private function secure($key, $toFilter, $sanitize = FILTER_SANITIZE_STRING)
+    {
+        if (array_key_exists($key, array_flip($this->rawResponse)) === true) {
+            return $toFilter;
         }
 
-        $notFiltered = $this->getNonFilteredElements($toFilter);
-return $notFiltered;
-       # return $notFiltered + filter_var_array($toFilter, $sanitize);
+        return filter_var($toFilter, $sanitize);
     }
 
     /**
@@ -181,10 +195,10 @@ return $notFiltered;
     {
         $notFiltered = [];
 
-        if (count($this->except) > 0) {
+        if (count($this->rawResponse) > 0) {
             $notFiltered = array_diff_key(
                 $toFilter,
-                array_diff_key($toFilter, array_flip($this->except))
+                array_diff_key($toFilter, array_flip($this->rawResponse))
             );
         }
 
