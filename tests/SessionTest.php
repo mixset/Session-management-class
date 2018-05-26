@@ -1,15 +1,14 @@
 <?php
 
-namespace Tests\Unit;
-
-use PHPUnit\Framework\TestCase;
-use SessionManager\Session;
+namespace SessionManager\Tests;
 
 ob_start();
 
+use SessionManager\Session;
+
 require_once 'src/Core/Session.php';
 
-class SessionTest extends TestCase
+class SessionTest extends \PHPUnit_Framework_TestCase
 {
     private $session;
 
@@ -21,14 +20,14 @@ class SessionTest extends TestCase
         $this->session->set([
             'foo' => '<b>bar</b>',
             'key' => 'value',
-            'class' => '<xxD>Session</xxD>',
+            'class' => '<i>Session</i>',
             'id' => 1,
         ], ['foo']);
     }
 
     public function testGetValueFromSession()
     {
-        $this->assertEquals('bar', $this->session->get('foo'));
+        $this->assertEquals('<b>bar</b>', $this->session->get('foo'));
         $this->assertEquals('value', $this->session->get('key'));
         $this->assertEquals('Session', $this->session->get('class'));
         $this->assertEquals(1, $this->session->get('id'));
@@ -41,7 +40,7 @@ class SessionTest extends TestCase
 
     public function testSetOneValue()
     {
-        $this->session->delete(2);
+        $this->session->delete(Session::SESSION_CLEAR_VARIABLE);
         $this->session->set(['key' => 'value']);
 
         $this->assertEquals(1, count($this->session->all()));
@@ -50,12 +49,15 @@ class SessionTest extends TestCase
 
     public function testExistsKeyInValue()
     {
+        $this->assertTrue($this->session->exists('foo'));
         $this->assertTrue($this->session->exists('key'));
+        $this->assertTrue($this->session->exists('class'));
+        $this->assertTrue($this->session->exists('id'));
     }
 
     public function testDeleteType2()
     {
-        $this->session->delete(2);
+        $this->session->delete(Session::SESSION_CLEAR_VARIABLE);
 
         $this->assertEquals(0, count($this->session->all()));
     }
@@ -69,7 +71,7 @@ class SessionTest extends TestCase
 
     public function testExceptKeys()
     {
-        $this->session->delete(2);
+        $this->session->delete(Session::SESSION_CLEAR_VARIABLE);
         $this->session->clearExceptKeys();
 
         $this->session->setExceptKeys(['login']);
