@@ -17,6 +17,26 @@ class Session
     public $rawResponse = [];
 
     /**
+     * Fire session_unset function
+     * Clear $_SESSION variable
+     * Equivalent to $_SESSION = []
+    */
+    const SESSION_CLEAR_VARIABLE = 1;
+
+    /**
+     * Fire session_destroy function
+     * Destroys data, that is stored in the session storage
+     * e.g. the session file in the file system)
+    */
+    const SESSION_CLEAR_FILE = 2;
+
+    /**
+     * Argument for session_regenerate_id
+     * Default 0 - does not removes old session
+    */
+    const DELETE_OLD_SESSION = false;
+
+    /**
      * Check, if session has been initialized.
      *
      * Session constructor.
@@ -58,20 +78,14 @@ class Session
     }
 
     /**
-     * Type:
-     * 1 -> Only regenerate session ID
-     * 2 -> Regenerate session ID with remove old session
-     *
      * Method is used to prevent Session hijacking attack
      *
-     * @param int $type
+     * @param bool $type
      * @return bool
-    */
-    public function regenerateId($type = 1)
+     */
+    public function regenerateId($type = self::DELETE_OLD_SESSION)
     {
-        return $type === 1
-            ? session_regenerate_id()
-            : session_regenerate_id(true);
+        return session_regenerate_id($type);
     }
 
     /**
@@ -86,6 +100,8 @@ class Session
     }
 
     /**
+     * Return all data from $_SESSION array
+     *
      * @return mixed
     */
     public function all()
@@ -97,10 +113,14 @@ class Session
      * @param array $data
      * @param array $rawResponse
      *
-     * @return string | array
-    */
-    public function set(array $data)
+     * @return array|string
+     */
+    public function set(array $data, array $rawResponse = [])
     {
+        if (count($rawResponse) > 0) {
+            $this->rawResponse = array_merge($this->rawResponse, $rawResponse);
+        }
+
         $data = $this->secureArray($data);
 
         if (count($data) === 1) {
@@ -126,19 +146,21 @@ class Session
     }
 
     /**
-     * $type int
-     * 1 -> Destroys all data registered to a session
-     * 2 -> Free all session variables
-     *
      * @param int $type
+     *
+     * @return bool
     */
-    public function delete($type = 1)
+    public function delete($type = self::SESSION_CLEAR_VARIABLE)
     {
-        if ($type === 1) {
-            session_destroy();
-        } else {
+        if ($type === self::SESSION_CLEAR_VARIABLE) {
             session_unset();
         }
+
+        if ($type === self::SESSION_CLEAR_FILE) {
+            return session_destroy();
+        }
+
+        return null;
     }
 
     /**
