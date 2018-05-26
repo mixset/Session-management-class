@@ -1,40 +1,39 @@
-##session.class.php
------------------
+# Session class
 
-This is class, which provides easy way to manage sessions on your website.
+Session class provides easy way to manage sessions using custom PHP functions on your website.
  
-How to install?
------------------
-To start using class, you have to include this class to your project, eg. use `include`,`require` function or `__autoload()` function. 
+## How to use
 
-How is class built?
------------------
-- `getSessionId()`
-- `regenerateId($type = true)`
-- `get($key)`
-- `all()`
-- `set($data = [])`
-- `exists($name)`
-- `remove($type = false)`
-- `removeOne($key)`
-- `secure($data)`
+To start using class, you need to include this class to your project, eg. use `include`,`require` or `__autoload()` function. 
+To run tests locally, install dependencies first by `composer install`.
+It will install latest `phpunit` for php 5.6 version.
 
-If you want to create new instance of class, you need to use this commend: `$session = new Module\Session();`
+##  Contributing
 
-Changelog
---------
+If you have any idea how application can be improved, please create new issue with detailed description of your idea. Thank you :)
+
+## Changelog
+
 [16-08-2013] - v1.0
 - First version has been released 
 
-[01.12.2015] - v.1.1
-- added namespace to not do conflict 
-- some methods have been improved
+[01.12.2015] - v1.1
+- Added namespace to not do conflict 
+- Some methods have been improved
 
 [15.02.2017] - v1.2
-- code optimization
-- secure method added
-- removed `$multi` param from `set` method
+- Code optimization
+- Secure method added
+- Removed `$multi` param from `set` method
 
-ToDo
---------
-- add management of session lifetime
+[30.03.2018]
+- Better directory structure
+- Added tests
+- Added separate file for demo
+- Created custom exception
+- Improved documentation of methods
+
+## ToDo
+
+- Add management of session lifetime
+- Add class loading by Composer
