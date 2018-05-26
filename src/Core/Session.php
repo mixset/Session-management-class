@@ -14,7 +14,27 @@ class Session
      *
      * @var array
     */
-    protected $except = [];
+    public $rawResponse = [];
+
+    /**
+     * Fire session_unset function
+     * Clear $_SESSION variable
+     * Equivalent to $_SESSION = []
+    */
+    const SESSION_CLEAR_VARIABLE = 1;
+
+    /**
+     * Fire session_destroy function
+     * Destroys data, that is stored in the session storage
+     * e.g. the session file in the file system)
+    */
+    const SESSION_CLEAR_FILE = 2;
+
+    /**
+     * Argument for session_regenerate_id
+     * Default 0 - does not removes old session
+    */
+    const DELETE_OLD_SESSION = false;
 
     /**
      * Check, if session has been initialized.
@@ -36,12 +56,19 @@ class Session
     */
     public function setExceptKeys(array $keys)
     {
-        $this->except = $keys;
+        $this->rawResponse = $keys;
     }
 
     /**
-     * @param none
-     * @return string || null
+     * Clear all except keys
+    */
+    public function clearExceptKeys()
+    {
+        $this->rawResponse = [];
+    }
+
+    /**
+     * @return null|string
     */
     public function getSessionId()
     {
@@ -51,20 +78,14 @@ class Session
     }
 
     /**
-     * Type:
-     * 1 -> Only regenerate session ID
-     * 2 -> Regenerate session ID with remove old session
-     *
      * Method is used to prevent Session hijacking attack
      *
-     * @param int $type
+     * @param bool $type
      * @return bool
-    */
-    public function regenerateId($type = 1)
+     */
+    public function regenerateId($type = self::DELETE_OLD_SESSION)
     {
-        return $type === 1
-            ? session_regenerate_id()
-            : session_regenerate_id(true);
+        return session_regenerate_id($type);
     }
 
     /**
@@ -75,24 +96,32 @@ class Session
     */
     public function get($key)
     {
-        return $this->secure($_SESSION[$key]);
+        return $this->secure($key, $_SESSION[$key]);
     }
 
     /**
+     * Return all data from $_SESSION array
+     *
      * @return mixed
-     */
+    */
     public function all()
     {
-        return $this->secure($_SESSION);
+        return $this->secureArray($_SESSION);
     }
 
     /**
      * @param array $data
-     * @return string || array
+     * @param array $rawResponse
+     *
+     * @return array|string
      */
-    public function set(array $data)
+    public function set(array $data, array $rawResponse = [])
     {
-        $data = $this->secure($data);
+        if (count($rawResponse) > 0) {
+            $this->rawResponse = array_merge($this->rawResponse, $rawResponse);
+        }
+
+        $data = $this->secureArray($data);
 
         if (count($data) === 1) {
             $_SESSION[array_keys($data)[0]] = array_values($data)[0];
@@ -117,19 +146,21 @@ class Session
     }
 
     /**
-     * $type int
-     * 1 -> Destroys all data registered to a session
-     * 2 -> Free all session variables
-     *
      * @param int $type
+     *
+     * @return bool
     */
-    public function delete($type = 1)
+    public function delete($type = self::SESSION_CLEAR_VARIABLE)
     {
-        if ($type === 1) {
-            session_destroy();
-        } else {
+        if ($type === self::SESSION_CLEAR_VARIABLE) {
             session_unset();
         }
+
+        if ($type === self::SESSION_CLEAR_FILE) {
+            return session_destroy();
+        }
+
+        return null;
     }
 
     /**
@@ -156,14 +187,43 @@ class Session
      * @param int $sanitize
      * @return mixed
     */
-    private function secure($toFilter, $sanitize = FILTER_SANITIZE_STRING)
+    private function secureArray($toFilter, $sanitize = FILTER_SANITIZE_STRING)
+    {
+        $notFiltered = $this->getNonFilteredElements($toFilter);
+        return $notFiltered + filter_var_array($toFilter, $sanitize);
+    }
+
+    /**
+     * @param $key
+     * @param $toFilter
+     * @param int $sanitize
+     * @return mixed
+    */
+    private function secure($key, $toFilter, $sanitize = FILTER_SANITIZE_STRING)
+    {
+        if (array_key_exists($key, array_flip($this->rawResponse)) === true) {
+            return $toFilter;
+        }
+
+        return filter_var($toFilter, $sanitize);
+    }
+
+    /**
+     * @param $toFilter
+     *
+     * @return array
+    */
+    private function getNonFilteredElements($toFilter)
     {
         $notFiltered = [];
 
-        if (count($this->except) > 0) {
-            $notFiltered = array_diff_key(array_keys($toFilter), $this->except);
+        if (count($this->rawResponse) > 0) {
+            $notFiltered = array_diff_key(
+                $toFilter,
+                array_diff_key($toFilter, array_flip($this->rawResponse))
+            );
         }
 
-        return $notFiltered + filter_var_array($toFilter, $sanitize);
+        return $notFiltered;
     }
 }
