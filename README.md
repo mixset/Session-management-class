@@ -1,6 +1,7 @@
 # Session class
 
 [![Build Status](https://travis-ci.org/mixset/Session-management-class.png)](https://travis-ci.org/mixset/Session-management-class)
+[![GitHub release](https://img.shields.io/github/release/mixset/Session-management-class.svg)](https://GitHub.com/mixset/Session-management-class/releases/)
 
 Session class provides easy way to manage sessions using custom PHP functions on your website.
  
