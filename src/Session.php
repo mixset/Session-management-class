@@ -1,10 +1,8 @@
 <?php
-/**
- * @author Dominik Ryńko <http://rynko.pl/>
- * @license http://creativecommons.org/licenses/by-sa/3.0/pl/
-*/
 
-namespace SessionManager;
+namespace Mixset\SessionManager;
+
+use Mixset\SessionManager\Exceptions\SessionException;
 
 class Session
 {
