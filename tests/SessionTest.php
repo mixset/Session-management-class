@@ -2,11 +2,11 @@
 
 namespace SessionManager\Tests;
 
+use Mixset\SessionManager\Session;
+
 ob_start();
 
-use SessionManager\Session;
-
-require_once 'src/Core/Session.php';
+require_once 'src/Session.php';
 
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
